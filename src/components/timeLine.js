@@ -1,6 +1,5 @@
 import React from 'react';
-import { makeStyles, useTheme, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-
+import { makeStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Timeline from '@material-ui/lab/Timeline';
 import TimelineItem from '@material-ui/lab/TimelineItem';
@@ -9,6 +8,7 @@ import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+
 const TimeLineStyles = createMuiTheme({
     overrides: {
         MuiTimeline: {
@@ -40,9 +40,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TimeLineApp() {
     const classes = useStyles();
-    const theme = useTheme();
-    const [value, setValue] = React.useState(0);
-
     return (
         <div className={classes.root}>
             <Grid container>

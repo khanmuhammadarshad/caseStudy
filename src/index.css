@@ -25,4 +25,11 @@ textarea{
   border-radius: 50%;
   cursor: pointer;
 }
+.HideMap {
+ display: none
+}
+.ShowMap {
+  display: block
+ }
+
 

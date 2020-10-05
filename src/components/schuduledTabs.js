@@ -7,9 +7,11 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+
 import Details from './details'
 import TimeLineApp from './timeLine'
 import AgentNotes from './agentNotes'
+
 const TabsStyles = createMuiTheme({
     overrides: {
         MuiTab: {
@@ -19,9 +21,8 @@ const TabsStyles = createMuiTheme({
                     border: '1px solid #e8e8e8',
                     minHeight: 30,
                     fontSize: 12,
-                    fontWeight:600,
-                    color:'#777C7E',
-                    // minWidth: 122,
+                    fontWeight: 600,
+                    color: '#777C7E',
                     "&:hover": {
                         borderBottom: "1px solid green",
                     },
@@ -29,7 +30,7 @@ const TabsStyles = createMuiTheme({
                 "&.Mui-selected": {
                     backgroundColor: "#00BF2C",
                     color: 'white',
-                    fontWeight:600,
+                    fontWeight: 600,
                 }
             }
         }
@@ -74,10 +75,10 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         width: '100%',
     },
-   
+
 }));
 
-export default function SuchuduledTab() {
+export default function SuchuduledTab(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
@@ -85,11 +86,9 @@ export default function SuchuduledTab() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
     const handleChangeIndex = (index) => {
         setValue(index);
     };
-
     return (
         <div className={classes.root}>
             <Grid container style={{ flexGrow: 1 }}>
@@ -113,17 +112,16 @@ export default function SuchuduledTab() {
                     <SwipeableViews
                         axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                         index={value}
-                        onChangeIndex={handleChangeIndex}
-                    >
+                        onChangeIndex={handleChangeIndex} >
                         <TabPanel value={value} index={0} dir={theme.direction}>
                             <Details />
                         </TabPanel>
                         <TabPanel value={value} index={1} dir={theme.direction}>
-                        <TimeLineApp />
+                            <TimeLineApp />
                         </TabPanel>
                         <TabPanel value={value} index={2} dir={theme.direction}>
-                        <AgentNotes />
-                          </TabPanel>
+                            <AgentNotes />
+                        </TabPanel>
                     </SwipeableViews>
                 </Grid>
             </Grid>

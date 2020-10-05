@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, createContext } from 'react';
 import PropTypes from 'prop-types';
 import SwipeableViews from 'react-swipeable-views';
 import { makeStyles, useTheme, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
@@ -9,8 +9,16 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+
 import SchuduledTabs from './schuduledTabs'
 import Maps from './map'
+import CoreHttpHandler from './http/services/CoreHttpHandler'
+
+const dataSourceOptionss = {
+    params: {
+        columns: "*",
+    },
+};
 
 const TabsStyle = createMuiTheme({
     overrides: {
@@ -33,10 +41,19 @@ const TabsStyle = createMuiTheme({
                     fontWeight: 600,
                 }
             }
+        },
+        palette: {
+            secondary: {
+                main: '#00BF2C'
+            },
+            primary: {
+                main: '#DF0202'
+            }
         }
     }
 });
 
+const DetailData = createContext()
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -94,6 +111,8 @@ export default function Index() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
+    const [data, setData] = React.useState([]);
+    const [isloading, setIsloading] = useState(true);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -102,62 +121,79 @@ export default function Index() {
     const handleChangeIndex = (index) => {
         setValue(index);
     };
+    React.useEffect(() => {
+        CoreHttpHandler.request('UserData', 'listing', { ...dataSourceOptionss.params }, dataSourceSuccess, dataSourceFailure);
+    }, [])
+    const dataSourceSuccess = (response) => {
+        setData(response.data)
+        setIsloading(false)
+    };
 
+    const dataSourceFailure = (response) => {
+        setIsloading(false)
+    };
+    let dataa = {
+        data: data,
+        isloading: isloading
+    }
     return (
         <div className={classes.root}>
-            <Grid container style={{ flexGrow: 1, padding: 5 }}>
-                <Grid item md={6} sm={12} xs={12} style={{ display: 'flex', alignSelf: 'center', alignItems: 'center', alignContent: 'center' }} >
-                    <AccountCircleIcon className={classes.AccountCircleIcons} />
-                    <ExitToAppIcon className={classes.ExitToAppIcons} />
-                    <div className={classes.logoutText}>Logout</div>
-                </Grid>
-                <Grid item md={6} sm={12} xs={12} style={{ alignSelf: 'center', alignItems: 'center', alignContent: 'center', marginTop: 12 }}>
-                    <MuiThemeProvider theme={TabsStyle}>
-                        <Tabs
-                            value={value}
-                            onChange={handleChange}
-                            indicatorColor="green"
-                            textColor="white"
-                            variant="fullWidth"
-                            // variant="scrollable"
-                            scrollButtons="auto"
-                            aria-label="scrollable auto tabs example"
+            <DetailData.Provider value={dataa}>
+                <Grid container style={{ flexGrow: 1, padding: 5 }}>
+                    <Grid item md={6} sm={12} xs={12} style={{ display: 'flex', alignSelf: 'center', alignItems: 'center', alignContent: 'center' }} >
+                        <AccountCircleIcon className={classes.AccountCircleIcons} />
+                        <ExitToAppIcon className={classes.ExitToAppIcons} />
+                        <div className={classes.logoutText}>Logout</div>
+                    </Grid>
+                    <Grid item md={6} sm={12} xs={12} style={{ alignSelf: 'center', alignItems: 'center', alignContent: 'center', marginTop: 12 }}>
+                        <MuiThemeProvider theme={TabsStyle}>
+                            <Tabs
+                                value={value}
+                                onChange={handleChange}
+                                indicatorColor="green"
+                                textColor="white"
+                                variant="fullWidth"
+                                // variant="scrollable"
+                                scrollButtons="auto"
+                                aria-label="scrollable auto tabs example"
+                            >
+                                <Tab label="QUEUE" {...a11yProps(0)} />
+                                <Tab label="SCHEDULED" {...a11yProps(1)} />
+                                <Tab label="IN PROGRESS" {...a11yProps(2)} />
+                                <Tab label="COMPLETED" {...a11yProps(3)} />
+                            </Tabs>
+                        </MuiThemeProvider>
+                    </Grid>
+                    <Grid item md={12} sm={12} xs={12} >
+                        <SwipeableViews
+                            axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                            index={value}
+                            onChangeIndex={handleChangeIndex}
                         >
-                            <Tab label="QUEUE" {...a11yProps(0)} />
-                            <Tab label="SCHEDULED" {...a11yProps(1)} />
-                            <Tab label="IN PROGRESS" {...a11yProps(2)} />
-                            <Tab label="COMPLETED" {...a11yProps(3)} />
-                        </Tabs>
-                    </MuiThemeProvider>
-                </Grid>
-                <Grid item md={12} sm={12} xs={12} >
-                    <SwipeableViews
-                        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                        index={value}
-                        onChangeIndex={handleChangeIndex}
-                    >
-                        <TabPanel value={value} index={0} dir={theme.direction}>
-                            {/* QUEUE */}
-                         </TabPanel>
-                        <TabPanel value={value} index={1} dir={theme.direction}>
-                            <Grid container >
-                                <Grid item md={6} sm={12} xs={12}  >
-                                    <SchuduledTabs />
+                            <TabPanel value={value} index={0} dir={theme.direction}>
+                                {/* QUEUE */}
+                            </TabPanel>
+                            <TabPanel value={value} index={1} dir={theme.direction}>
+                                <Grid container >
+                                    <Grid item md={6} sm={12} xs={12}  >
+                                        <SchuduledTabs />
+                                    </Grid>
+                                    <Grid item md={6} sm={12} xs={12} >
+                                        <Maps />
+                                    </Grid>
                                 </Grid>
-                                <Grid item md={6} sm={12} xs={12} >
-                                    <Maps />
-                                </Grid>
-                            </Grid>
-                        </TabPanel>
-                        <TabPanel value={value} index={2} dir={theme.direction}>
-                            {/* IN PROGRESS */}
-                        </TabPanel>
-                        <TabPanel value={value} index={3} dir={theme.direction}>
-                            {/* COMPLETED */}
-                        </TabPanel>
-                    </SwipeableViews>
+                            </TabPanel>
+                            <TabPanel value={value} index={2} dir={theme.direction}>
+                                {/* IN PROGRESS */}
+                            </TabPanel>
+                            <TabPanel value={value} index={3} dir={theme.direction}>
+                                {/* COMPLETED */}
+                            </TabPanel>
+                        </SwipeableViews>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </DetailData.Provider>
         </div>
     );
 }
+export { DetailData }
